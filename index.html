@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Neonatal — Registro de Visita</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f7f7f5;--bg3:#eeede6;
+  --text:#1a1a18;--text2:#6b6b67;--text3:#9b9b96;
+  --border:rgba(0,0,0,0.11);--border2:rgba(0,0,0,0.20);
+  --teal:#0F6E56;--teal-bg:#E1F5EE;--teal-text:#085041;
+  --warn-bg:#FAEEDA;--warn-border:#EF9F27;--warn-text:#633806;
+  --danger-bg:#FCEBEB;--danger-border:#F09595;--danger-text:#791F1F;
+  --info-bg:#E6F1FB;--info-border:#85B7EB;--info-text:#0C447C;
+  --purple-bg:#F3EFFE;--purple-border:#C4A8F5;--purple-text:#4B1DA8;
+  --radius:8px;--radius-lg:12px;
+  --tab-h:56px;
+}
+
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;color:var(--text);background:var(--bg3)}
+
+/* ===== LAYOUT ===== */
+.shell{display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--bg);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:50}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar h1{font-size:16px;font-weight:700;color:var(--teal);line-height:1.2}
+.topbar p{font-size:12px;color:var(--text2)}
+
+.main-content{flex:1;padding:14px 14px 80px}
+.max-w{max-width:860px;margin:0 auto}
+
+/* ===== TABS ===== */
+.tab-bar{position:fixed;bottom:0;left:0;right:0;height:var(--tab-h);background:var(--bg);border-top:1px solid var(--border);display:flex;z-index:50}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:500;color:var(--text3);border:none;background:none;cursor:pointer;padding:6px 4px;transition:color 0.15s}
+.tab-btn i{font-size:22px}
+.tab-btn.active{color:var(--teal)}
+.tab-btn.active i{font-weight:700}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* ===== BOTÕES ===== */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg);color:var(--text);font-size:14px;font-weight:500;cursor:pointer;transition:background 0.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.btn:active{opacity:0.8}
+.btn-primary{background:var(--teal);border-color:var(--teal);color:#E1F5EE}
+.btn-sm{padding:6px 12px;font-size:13px}
+.btn-xs{padding:4px 8px;font-size:12px}
+.btn-danger{border-color:#C0392B;color:#C0392B}
+.btn-danger:active{background:var(--danger-bg)}
+.btn-warn{border-color:#854F0B;color:#854F0B}
+.btn-warn:active{background:var(--warn-bg)}
+.btn-ghost{border-color:transparent;color:var(--text2)}
+
+/* ===== MODAL ===== */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 12px 80px}
+.modal-overlay.open{display:block}
+.modal{background:var(--bg);border-radius:var(--radius-lg);border:1px solid var(--border);width:100%;max-width:560px;margin:0 auto;padding:20px}
+.modal h2{font-size:16px;font-weight:700;margin-bottom:16px}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap}
+
+/* ===== FORMS ===== */
+.form-row{display:grid;gap:10px;margin-bottom:10px}
+.cols1{grid-template-columns:1fr}
+.cols2{grid-template-columns:1fr 1fr}
+.cols3{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.03em}
+.form-group input,.form-group select,.form-group textarea{padding:10px 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg);color:var(--text);font-size:15px;width:100%;font-family:inherit}
+.form-group textarea{resize:vertical;min-height:70px}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(15,110,86,0.15)}
+.section-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin:16px 0 8px;border-bottom:1px solid var(--border);padding-bottom:5px}
+
+/* ===== RADIO/CHECKBOX PILLS ===== */
+.cb-group{display:flex;flex-wrap:wrap;gap:6px}
+.cb-opt{display:flex;align-items:center;gap:5px;font-size:13px;padding:7px 12px;border:1px solid var(--border2);border-radius:var(--radius);cursor:pointer;background:var(--bg);transition:all 0.1s;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.cb-opt.on{background:var(--teal-bg);border-color:#1D9E75;color:var(--teal-text);font-weight:500}
+.cb-opt input{accent-color:var(--teal);width:14px;height:14px}
+
+/* ===== BADGES ===== */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:999px;font-size:12px;font-weight:500}
+.badge-teal{background:var(--teal-bg);color:var(--teal-text)}
+.badge-warn{background:var(--warn-bg);color:var(--warn-text)}
+.badge-info{background:var(--info-bg);color:var(--info-text)}
+.badge-danger{background:var(--danger-bg);color:var(--danger-text)}
+.badge-gray{background:#E8E7E0;color:#444}
+
+/* ===== ALERTS ===== */
+.alert{border-radius:var(--radius);padding:9px 12px;font-size:13px;margin-bottom:5px;display:flex;align-items:flex-start;gap:8px;border:1px solid;line-height:1.4}
+.alert-warn{background:var(--warn-bg);border-color:var(--warn-border);color:var(--warn-text)}
+.alert-danger{background:var(--danger-bg);border-color:var(--danger-border);color:var(--danger-text)}
+.alert-info{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}
+.alert i{flex-shrink:0;font-size:15px;margin-top:1px}
+
+/* ===== CARDS DE PACIENTE ===== */
+.patient-grid{display:grid;gap:10px}
+.section-group-title{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin:14px 0 6px;display:flex;align-items:center;gap:6px}
+.section-group-title:first-child{margin-top:0}
+
+.patient-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.patient-card.visited{border-color:#1D9E75}
+
+.card-header{padding:12px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.card-header:active{background:var(--bg2)}
+.patient-name{font-size:15px;font-weight:700;display:flex;align-items:center;gap:7px}
+.patient-meta{font-size:12px;color:var(--text2);margin-top:3px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.card-actions{display:flex;gap:5px;flex-shrink:0;align-items:flex-start}
+
+.visited-badge{display:inline-flex;align-items:center;gap:3px;background:var(--teal-bg);color:var(--teal-text);font-size:11px;font-weight:600;padding:2px 7px;border-radius:999px}
+
+.hv-pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600}
+.hv-pill.horas{background:var(--teal-bg);color:var(--teal-text)}
+.hv-pill.dias{background:var(--info-bg);color:var(--info-text)}
+
+/* card body collapsible */
+.card-body{padding:0 14px 14px;border-top:1px solid var(--border)}
+.card-body.collapsed{display:none}
+
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:6px;margin:10px 0}
+.info-cell{background:var(--bg2);border-radius:var(--radius);padding:7px 10px}
+.info-cell .lbl{font-size:11px;color:var(--text2);margin-bottom:2px}
+.info-cell .val{font-size:13px;font-weight:600}
+
+/* evo section */
+.evo-section{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.evo-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.evo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:6px;margin-bottom:8px}
+
+/* condutas */
+.condutas-wrap{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.condutas-title{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:0.04em}
+
+/* hs row */
+.hs-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.hs-lbl{min-width:145px;color:var(--text2);font-size:12px;font-weight:600;padding-top:9px;flex-shrink:0}
+.sub-input{padding:7px 10px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg);color:var(--text);font-size:14px;text-align:center}
+.sub-input:focus{outline:none;border-color:var(--teal)}
+
+.sor-row{display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--bg2);border-radius:var(--radius);padding:8px 12px;flex-wrap:wrap}
+.sor-row span{font-size:13px}
+
+/* empty */
+.empty-state{text-align:center;padding:48px 16px;color:var(--text2);font-size:14px;background:var(--bg);border-radius:var(--radius-lg);border:1px dashed var(--border2)}
+.empty-state i{font-size:40px;display:block;margin-bottom:10px;color:var(--text3)}
+
+/* ===== CHECKLIST TAB ===== */
+.checklist-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px}
+.checklist-card+.checklist-card{margin-top:10px}
+.checklist-name{font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.checklist-meta{font-size:12px;color:var(--text2);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.checklist-items{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.check-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--radius);cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:14px;font-weight:500;transition:all 0.12s}
+.check-item input[type=checkbox]{width:18px;height:18px;accent-color:var(--teal);flex-shrink:0}
+.check-item.done{background:var(--teal-bg);border-color:#1D9E75;color:var(--teal-text)}
+.check-item.done span{text-decoration:line-through;opacity:0.7}
+.checklist-progress{height:4px;border-radius:2px;background:var(--bg3);margin-bottom:10px;overflow:hidden}
+.checklist-progress-bar{height:100%;background:var(--teal);border-radius:2px;transition:width 0.3s}
+.all-done{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--teal-text)}
+
+/* ===== GLICEMIAS ===== */
+.glic-values{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.glic-input-row{display:flex;align-items:center;gap:8px}
+.glic-input-row input{flex:1;padding:9px 12px;border-radius:var(--radius);border:1px solid var(--border2);font-size:15px;background:var(--bg);color:var(--text)}
+.glic-input-row input:focus{outline:none;border-color:var(--teal)}
+.glic-hint{font-size:12px;color:var(--text2);margin-top:2px}
+
+/* ===== RESPONSIVO ===== */
+@media(max-width:480px){
+  .topbar h1{font-size:14px}
+  .topbar p{display:none}
+  .cols3{grid-template-columns:1fr 1fr}
+  .cols2{grid-template-columns:1fr 1fr}
+  .form-group input,.form-group select,.form-group textarea{font-size:16px} /* evita zoom no iOS */
+  .checklist-items{grid-template-columns:1fr}
+  .modal{padding:16px}
+  .card-actions .btn-sm span{display:none}
+  .hs-lbl{min-width:110px}
+  .sor-row{flex-direction:column;align-items:flex-start}
+}
+@media(max-width:360px){
+  .cols3{grid-template-columns:1fr}
+  .cols2{grid-template-columns:1fr}
+}
+@media(min-width:768px){
+  .main-content{padding:20px 20px 90px}
+  .tab-bar{height:60px}
+  .checklist-items{grid-template-columns:repeat(4,1fr)}
+  .info-grid{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <i class="ti ti-heart-handshake" style="font-size:24px;color:var(--teal);flex-shrink:0"></i>
+      <div>
+        <h1>Neonatal</h1>
+        <p>Registro de visita médica</p>
+      </div>
+    </div>
+    <div id="topbar-actions"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-content">
+    <div class="max-w">
+      <!-- ABA 1: PACIENTES -->
+      <div class="tab-pane active" id="pane-pacientes">
+        <div id="patient-list" class="patient-grid"></div>
+      </div>
+      <!-- ABA 2: CHECKLIST -->
+      <div class="tab-pane" id="pane-checklist">
+        <div id="checklist-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-pacientes" onclick="switchTab('pacientes')">
+      <i class="ti ti-users"></i>
+      <span>Pacientes</span>
+    </button>
+    <button class="tab-btn" id="tab-checklist" onclick="switchTab('checklist')">
+      <i class="ti ti-clipboard-check"></i>
+      <span>Pós-visita</span>
+    </button>
+  </div>
+</div>
+
+<!-- ============================
+     MODAL: REGISTRO
+============================= -->
+<div class="modal-overlay" id="modal-reg">
+  <div class="modal">
+    <h2 id="modal-reg-title">Novo paciente</h2>
+    <div class="form-row cols1">
+      <div class="form-group">
+        <label>Nome do paciente</label>
+        <input type="text" id="r-nome" placeholder="RN de Maria Silva">
+      </div>
+    </div>
+    <div class="form-row cols3">
+      <div class="form-group">
+        <label>Data nasc.</label>
+        <input type="date" id="r-datanasc">
+      </div>
+      <div class="form-group">
+        <label>Hora nasc.</label>
+        <input type="time" id="r-horanasc">
+      </div>
+      <div class="form-group">
+        <label>Peso nasc. (g)</label>
+        <input type="number" id="r-peso" placeholder="3200" inputmode="numeric">
+      </div>
+    </div>
+    <div class="form-row cols3">
+      <div class="form-group">
+        <label>IG (semanas)</label>
+        <input type="number" id="r-ig" placeholder="38" min="22" max="42" step="0.1" inputmode="decimal">
+      </div>
+      <div class="form-group">
+        <label>Leito</label>
+        <input type="text" id="r-leito" placeholder="2A">
+      </div>
+      <div class="form-group">
+        <label>Enfermaria</label>
+        <select id="r-enfermaria">
+          <option value="">Selecionar...</option>
+          <option>ALCON</option>
+          <option>BERÇÁRIO</option>
+          <option>CPN</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('reg')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveRegistro()"><i class="ti ti-check"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     MODAL: EVOLUÇÃO
+============================= -->
+<div class="modal-overlay" id="modal-evo">
+  <div class="modal">
+    <h2>Evolução — <span id="evo-nome" style="color:var(--teal)"></span></h2>
+
+    <div class="section-label">Peso</div>
+    <div class="form-row cols2">
+      <div class="form-group">
+        <label>Peso hoje (g)</label>
+        <input type="number" id="e-peso" placeholder="3100" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="section-label">Glicemias</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <label class="cb-opt" id="lbl-glic">
+        <input type="checkbox" id="e-glic-on" onchange="toggleCb('e-glic-on','lbl-glic');toggleGlic()"> Monitorando glicemia
+      </label>
+    </div>
+    <div id="glic-wrap" style="display:none">
+      <div class="glic-input-row">
+        <input type="text" id="e-glic-vals" placeholder="Ex: 75-60-52-48" inputmode="text">
+      </div>
+      <div class="glic-hint">Informe os valores separados por hífen</div>
+    </div>
+
+    <div class="section-label">Tipo sanguíneo</div>
+    <div class="hs-row"><span class="hs-lbl">RN</span><div class="cb-group" id="ts-rn"></div></div>
+    <div class="hs-row"><span class="hs-lbl">Mãe</span><div class="cb-group" id="ts-mae"></div></div>
+
+    <div class="section-label">Alimentação</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <label class="cb-opt" id="lbl-formula">
+          <input type="checkbox" id="e-formula" onchange="toggleCb('e-formula','lbl-formula');toggleVolume()"> Fórmula infantil
+        </label>
+        <span id="vol-wrap" style="display:none;align-items:center;gap:6px">
+          <input type="number" class="sub-input" id="e-vol" placeholder="ml" inputmode="numeric" style="width:80px">
+          <span style="font-size:13px;color:var(--text2)">ml/dose</span>
+        </span>
+      </div>
+      <label class="cb-opt" id="lbl-smld">
+        <input type="checkbox" id="e-smld" onchange="toggleCb('e-smld','lbl-smld')"> SMLD
+      </label>
+    </div>
+
+    <div class="section-label">Eliminações e sintomas</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">Diurese</div>
+        <div class="cb-group" id="elim-diurese"></div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">Evacuação</div>
+        <div class="cb-group" id="elim-evac"></div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">Vômitos</div>
+        <div class="cb-group" id="elim-vom"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Exames e achados clínicos</div>
+    <div class="hs-row"><span class="hs-lbl">Coraçãozinho</span><div class="cb-group" id="ts-coracao"></div></div>
+    <div class="hs-row"><span class="hs-lbl">Icterícia</span><div class="cb-group" id="ts-icteria"></div></div>
+    <div class="hs-row" style="flex-wrap:wrap">
+      <span class="hs-lbl">Fototerapia</span>
+      <div class="cb-group" id="ts-foto"></div>
+      <span id="foto-data-wrap" style="display:none;align-items:center;gap:6px;margin-top:4px;width:100%;padding-left:145px">
+        <span style="font-size:12px;color:var(--text2)">Início:</span>
+        <input type="date" id="e-foto-data" class="sub-input" style="width:140px">
+      </span>
+    </div>
+
+    <div class="section-label">Sorologias maternas</div>
+    <div style="display:grid;grid-template-columns:1fr;gap:6px" id="sorologias-grid"></div>
+
+    <div class="section-label">Observações</div>
+    <div class="form-group">
+      <textarea id="e-obs" placeholder="Anotações livres sobre a evolução..."></textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('evo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEvolucao()"><i class="ti ti-check"></i> Salvar evolução</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     MODAL: CHECKLIST NOVO
+============================= -->
+<div class="modal-overlay" id="modal-chk">
+  <div class="modal">
+    <h2>Adicionar à pós-visita</h2>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>Nome do RN</label>
+      <input type="text" id="chk-nome" placeholder="RN de Maria Silva" list="chk-nome-list">
+      <datalist id="chk-nome-list"></datalist>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('chk')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveChecklist()"><i class="ti ti-check"></i> Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONSTANTES
+============================================================ */
+/* Grupo 1: Imunidade (Toxo, Rubéola, CMV) — opções: Pendente | Imune | Suscetível */
+const SOR_IMUNIDADE=['Toxoplasmose','Rubéola','CMV'];
+const SOR_IMUNIDADE_OPTS=['Pendente','Imune','Suscetível'];
+/* Grupo 2: Doenças infecciosas — opções: NR | Reagente | Pendente */
+const SOR_INFECCAO=['VDRL','HIV','Chagas','HTLV','Hepatite B','Hepatite C'];
+const SOR_INFECCAO_OPTS=['NR','Reagente','Pendente'];
+/* Lista completa para iteração genérica */
+const SOROLOGIAS=[...SOR_IMUNIDADE,...SOR_INFECCAO];
+function sorOpts(nome){ return SOR_IMUNIDADE.includes(nome)?SOR_IMUNIDADE_OPTS:SOR_INFECCAO_OPTS; }
+function sorDefault(nome){ return SOR_IMUNIDADE.includes(nome)?'Pendente':'Pendente'; }
+function sorIsPendente(nome,val){ return !val||val==='Pendente'; }
+function sorIsReagente(nome,val){ return !SOR_IMUNIDADE.includes(nome)&&val==='Reagente'; }
+function sorIsSuscetivel(nome,val){ return SOR_IMUNIDADE.includes(nome)&&val==='Suscetível'; }
+const TIPOS_SANG=['A+','A-','B+','B-','AB+','AB-','O+','O-'];
+const TIPOS_RN=[...TIPOS_SANG,'??'];
+const TIPOS_MAE=[...TIPOS_SANG,'??'];
+const SN=['Sim','Não'];
+const CORACAO=['Normal','Alterado','Não realizado'];
+const ENFERMARIAS=['ALCON','BERÇÁRIO','CPN'];
+const CHK_ITEMS=['Evolução','Prescrição','Pedidos de exames','Alta'];
+
+/* ============================================================
+   STATE
+============================================================ */
+let patients=[];
+let checklists=[];
+let editingId=null;
+let evoId=null;
+
+/* ============================================================
+   PERSISTÊNCIA
+============================================================ */
+function save(){
+  try{
+    localStorage.setItem('neonatal_p',JSON.stringify(patients));
+    localStorage.setItem('neonatal_c',JSON.stringify(checklists));
+  }catch(e){}
+}
+function load(){
+  try{
+    const p=localStorage.getItem('neonatal_p');if(p) patients=JSON.parse(p);
+    const c=localStorage.getItem('neonatal_c');if(c) checklists=JSON.parse(c);
+  }catch(e){}
+}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+
+/* ============================================================
+   TABS
+============================================================ */
+function switchTab(t){
+  document.querySelectorAll('.tab-pane').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('pane-'+t).classList.add('active');
+  document.getElementById('tab-'+t).classList.add('active');
+  updateTopbarActions(t);
+  if(t==='checklist') renderChecklist();
+}
+function updateTopbarActions(t){
+  const el=document.getElementById('topbar-actions');
+  if(t==='pacientes'){
+    el.innerHTML=`<button class="btn btn-primary btn-sm" onclick="openReg(null)"><i class="ti ti-plus"></i> <span>Novo paciente</span></button>`;
+  } else {
+    el.innerHTML=`<button class="btn btn-primary btn-sm" onclick="openChkModal()"><i class="ti ti-plus"></i> <span>Adicionar</span></button>`;
+  }
+}
+
+/* ============================================================
+   TEMPO DE VIDA
+============================================================ */
+function horasDeVida(dataNasc,horaNasc){
+  if(!dataNasc||!horaNasc) return null;
+  const nasc=new Date(dataNasc+'T'+horaNasc);
+  return Math.max(0,(Date.now()-nasc)/3600000);
+}
+function fmtHoras(h){
+  if(h===null) return '—';
+  if(h<120){
+    const hh=Math.floor(h);
+    const mm=Math.floor((h-hh)*60);
+    return mm>0?`${hh}h ${mm}min`:`${hh}h`;
+  }
+  const d=Math.floor(h/24);
+  const hr=Math.floor(h%24);
+  return hr>0?`${d}d ${hr}h`:`${d}d`;
+}
+
+/* ============================================================
+   LÓGICA CLÍNICA
+============================================================ */
+function isMaeRisco(ts){
+  if(!ts||ts==='??') return false;
+  return ts.includes('-')||ts.startsWith('O');
+}
+function motivoRisco(ts){
+  if(!ts) return '';
+  const neg=ts.includes('-');
+  const tipoO=ts.startsWith('O');
+  if(neg&&tipoO) return 'mãe tipo O e Rh negativo';
+  if(tipoO) return 'mãe tipo O';
+  if(neg) return 'mãe Rh negativo';
+  return '';
+}
+function calcPeso(pNasc,pHoje){
+  if(!pNasc||!pHoje) return null;
+  const perdido=pNasc-pHoje;
+  return{perdido,pct:(perdido/pNasc)*100};
+}
+
+/* Parse glicemias: string "75-60-52-48" → [75,60,52,48] */
+function parseGlic(str){
+  if(!str) return [];
+  return str.split(/[-,;\s]+/).map(Number).filter(n=>!isNaN(n)&&n>0);
+}
+
+function condutas(p){
+  const alerts=[];
+  const hv=horasDeVida(p.dataNasc,p.horaNasc);
+  const evo=p.evo||{};
+
+  /* TS do RN ausente com mãe de risco */
+  const maeRisco=isMaeRisco(evo.tsMae);
+  const rnSemTipo=!evo.tsRN||evo.tsRN==='??';
+  if(maeRisco&&rnSemTipo){
+    alerts.push({type:'warn',msg:`Solicitar tipo sanguíneo do RN (${motivoRisco(evo.tsMae)})`});
+  }
+
+  /* Incompatibilidade sanguínea */
+  if(evo.tsMae&&evo.tsRN&&evo.tsRN!=='??'&&evo.tsMae!=='??'){
+    const maeNeg=evo.tsMae.includes('-');
+    const rnPos=evo.tsRN.includes('+');
+    const maeO=evo.tsMae.startsWith('O');
+    const rnABouB=/^(A|B|AB)/.test(evo.tsRN);
+    if(maeNeg&&rnPos){
+      alerts.push({type:'danger',msg:'Incompatibilidade sanguínea: mãe Rh negativo / RN Rh positivo'});
+    } else if(maeO&&rnABouB){
+      alerts.push({type:'danger',msg:'Incompatibilidade sanguínea: mãe tipo O / RN tipo '+evo.tsRN.replace(/[+-]/,'')});
+    }
+  }
+
+  /* Glicemias */
+  if(evo.glicOn){
+    const vals=parseGlic(evo.glicVals);
+    if(vals.length>0){
+      const limiar=hv!==null&&hv<48?50:60;
+      const label=hv!==null&&hv<48?'< 48h':'≥ 48h';
+      const baixas=vals.filter(v=>v<limiar);
+      if(baixas.length>0){
+        alerts.push({type:'danger',msg:`Hipoglicemia < ${limiar} mg/dL (${label}): valores ${baixas.join(', ')} mg/dL`});
+      }
+    }
+  }
+
+  /* Perda de peso > 7% */
+  if(evo.pesoHoje&&p.pesoNasc){
+    const c=calcPeso(p.pesoNasc,evo.pesoHoje);
+    if(c&&c.pct>7)
+      alerts.push({type:'danger',msg:`Atenção ao peso perdido: ${c.pct.toFixed(1)}% (−${c.perdido}g em relação ao PN)`});
+  }
+
+  /* Sorologias pendentes */
+  const sorPend=SOROLOGIAS.filter(s=>sorIsPendente(s,(evo.sorologias||{})[s]));
+  if(sorPend.length>0)
+    alerts.push({type:'info',msg:`Solicitar/aguardar sorologia de: ${sorPend.join(', ')}`});
+
+  /* Sorologias reagentes (grupo infecção) */
+  const sorReag=SOR_INFECCAO.filter(s=>sorIsReagente(s,(evo.sorologias||{})[s]));
+  if(sorReag.length>0)
+    alerts.push({type:'danger',msg:`Sorologia reagente: ${sorReag.join(', ')} — avaliar conduta`});
+
+  /* Sorologias suscetíveis (grupo imunidade) */
+  const sorSusc=SOR_IMUNIDADE.filter(s=>sorIsSuscetivel(s,(evo.sorologias||{})[s]));
+  if(sorSusc.length>0)
+    alerts.push({type:'warn',msg:`Mãe suscetível: ${sorSusc.join(', ')} — atenção às precauções`});
+
+  /* Icterícia → BTF */
+  if(evo.icteria==='Sim')
+    alerts.push({type:'warn',msg:'Solicitar BTF'});
+
+  /* ≥ 24h sem coraçãozinho */
+  if(hv!==null&&hv>=24&&(!evo.coracao||evo.coracao==='Não realizado'))
+    alerts.push({type:'danger',msg:'Realizar teste do coraçãozinho'});
+
+  return alerts;
+}
+
+/* ============================================================
+   ORDENAÇÃO: enfermaria (ALCON→BERÇÁRIO→CPN) depois leito alfanumérico
+============================================================ */
+function sortPatients(arr){
+  const enfOrder={'ALCON':0,'BERÇÁRIO':1,'CPN':2};
+  return [...arr].sort((a,b)=>{
+    const ea=enfOrder[a.enfermaria]??99;
+    const eb=enfOrder[b.enfermaria]??99;
+    if(ea!==eb) return ea-eb;
+    /* leito: extrair número e letra "2A" → [2,'A'] */
+    const pa=parseLeito(a.leito||'');
+    const pb=parseLeito(b.leito||'');
+    if(pa.n!==pb.n) return pa.n-pb.n;
+    return pa.l.localeCompare(pb.l);
+  });
+}
+function parseLeito(s){
+  const m=s.match(/^(\d+)([A-Za-z]*)$/);
+  if(m) return{n:parseInt(m[1]),l:m[2].toUpperCase()};
+  return{n:9999,l:s};
+}
+
+/* ============================================================
+   VISITA REALIZADA HOJE
+============================================================ */
+function visitadaHoje(evo){
+  if(!evo||!evo.updatedAt) return false;
+  const hoje=new Date().toDateString();
+  return new Date(evo.updatedAt).toDateString()===hoje;
+}
+
+/* ============================================================
+   COMPONENTES UI
+============================================================ */
+function buildRadio(containerId,opts,name,current){
+  const el=document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML='';
+  opts.forEach(o=>{
+    const lbl=document.createElement('label');
+    lbl.className='cb-opt'+(current===o?' on':'');
+    const inp=document.createElement('input');
+    inp.type='radio';inp.name=name;inp.value=o;
+    if(current===o) inp.checked=true;
+    inp.onchange=()=>{
+      el.querySelectorAll('.cb-opt').forEach(l=>l.classList.remove('on'));
+      lbl.classList.add('on');
+      if(name==='foto'){
+        const fw=document.getElementById('foto-data-wrap');
+        if(fw) fw.style.display=o==='Sim'?'flex':'none';
+      }
+    };
+    lbl.appendChild(inp);lbl.appendChild(document.createTextNode(o));
+    el.appendChild(lbl);
+  });
+}
+
+function buildSorologias(current={}){
+  const grid=document.getElementById('sorologias-grid');
+  grid.innerHTML='';
+
+  /* Título grupo imunidade */
+  const t1=document.createElement('div');
+  t1.style='grid-column:1/-1;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-top:4px;margin-bottom:2px';
+  t1.textContent='Imunidade materna';
+  grid.appendChild(t1);
+
+  SOR_IMUNIDADE.forEach(s=>buildSorRow(grid,s,current[s]||'Pendente',SOR_IMUNIDADE_OPTS));
+
+  /* Título grupo infecção */
+  const t2=document.createElement('div');
+  t2.style='grid-column:1/-1;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-top:10px;margin-bottom:2px';
+  t2.textContent='Doenças infecciosas';
+  grid.appendChild(t2);
+
+  SOR_INFECCAO.forEach(s=>buildSorRow(grid,s,current[s]||'Pendente',SOR_INFECCAO_OPTS));
+}
+
+function buildSorRow(grid,s,cur,opts){
+  const div=document.createElement('div');
+  div.className='sor-row';
+  div.innerHTML=`<span>${s}</span>`;
+  const grp=document.createElement('div');grp.className='cb-group';
+  opts.forEach(opt=>{
+    const lbl=document.createElement('label');
+    lbl.className='cb-opt'+(cur===opt?' on':'');
+    const inp=document.createElement('input');
+    inp.type='radio';inp.name='sor-'+s;inp.value=opt;
+    if(cur===opt) inp.checked=true;
+    inp.onchange=()=>{grp.querySelectorAll('.cb-opt').forEach(l=>l.classList.remove('on'));lbl.classList.add('on')};
+    lbl.appendChild(inp);lbl.appendChild(document.createTextNode(opt));
+    grp.appendChild(lbl);
+  });
+  div.appendChild(grp);grid.appendChild(div);
+}
+
+function toggleCb(cbId,lblId){
+  const cb=document.getElementById(cbId);
+  const lbl=document.getElementById(lblId);
+  if(cb&&lbl) lbl.classList.toggle('on',cb.checked);
+}
+function toggleVolume(){
+  const show=document.getElementById('e-formula').checked;
+  const w=document.getElementById('vol-wrap');
+  if(w) w.style.display=show?'flex':'none';
+}
+function toggleGlic(){
+  const show=document.getElementById('e-glic-on').checked;
+  const w=document.getElementById('glic-wrap');
+  if(w) w.style.display=show?'block':'none';
+}
+
+/* ============================================================
+   MODAIS
+============================================================ */
+function openModal(t){document.getElementById('modal-'+t).classList.add('open')}
+function closeModal(t){
+  document.getElementById('modal-'+t).classList.remove('open');
+  if(t==='reg'){editingId=null;clearRegForm()}
+  if(t==='evo') evoId=null;
+}
+
+/* click fora fecha */
+['reg','evo','chk'].forEach(t=>{
+  document.addEventListener('DOMContentLoaded',()=>{},false);
+});
+
+function clearRegForm(){
+  ['r-nome','r-datanasc','r-horanasc','r-peso','r-ig','r-leito'].forEach(id=>{
+    const el=document.getElementById(id);if(el) el.value='';
+  });
+  document.getElementById('r-enfermaria').value='';
+  document.getElementById('modal-reg-title').textContent='Novo paciente';
+}
+
+/* ---- REGISTRO ---- */
+function openReg(id){
+  editingId=id;clearRegForm();
+  if(id){
+    const p=patients.find(x=>x.id===id);
+    if(p){
+      document.getElementById('modal-reg-title').textContent='Editar registro';
+      document.getElementById('r-nome').value=p.nome||'';
+      document.getElementById('r-datanasc').value=p.dataNasc||'';
+      document.getElementById('r-horanasc').value=p.horaNasc||'';
+      document.getElementById('r-peso').value=p.pesoNasc||'';
+      document.getElementById('r-ig').value=p.ig||'';
+      document.getElementById('r-leito').value=p.leito||'';
+      document.getElementById('r-enfermaria').value=p.enfermaria||'';
+    }
+  }
+  openModal('reg');
+}
+function saveRegistro(){
+  const nome=document.getElementById('r-nome').value.trim();
+  const dataNasc=document.getElementById('r-datanasc').value;
+  const horaNasc=document.getElementById('r-horanasc').value;
+  const pesoNasc=parseInt(document.getElementById('r-peso').value)||0;
+  const ig=parseFloat(document.getElementById('r-ig').value)||0;
+  const leito=document.getElementById('r-leito').value.trim();
+  const enfermaria=document.getElementById('r-enfermaria').value;
+  if(!nome||!dataNasc||!horaNasc||!pesoNasc){alert('Preencha: nome, data/hora de nascimento e peso.');return}
+  if(editingId){
+    const p=patients.find(x=>x.id===editingId);
+    if(p) Object.assign(p,{nome,dataNasc,horaNasc,pesoNasc,ig,leito,enfermaria});
+  } else {
+    patients.push({id:uid(),nome,dataNasc,horaNasc,pesoNasc,ig,leito,enfermaria,evo:null,expanded:false});
+  }
+  save();render();closeModal('reg');
+}
+
+/* ---- EVOLUÇÃO ---- */
+function openEvo(id){
+  evoId=id;
+  const p=patients.find(x=>x.id===id);if(!p) return;
+  document.getElementById('evo-nome').textContent=p.nome;
+  const evo=p.evo||{};
+  document.getElementById('e-peso').value=evo.pesoHoje||'';
+
+  /* Glicemia */
+  const gOn=document.getElementById('e-glic-on');
+  gOn.checked=!!evo.glicOn;
+  document.getElementById('lbl-glic').classList.toggle('on',!!evo.glicOn);
+  document.getElementById('e-glic-vals').value=evo.glicVals||'';
+  document.getElementById('glic-wrap').style.display=evo.glicOn?'block':'none';
+
+  buildRadio('ts-rn',TIPOS_RN,'tsrn',evo.tsRN||null);
+  buildRadio('ts-mae',TIPOS_MAE,'tsmae',evo.tsMae||null);
+  buildRadio('elim-diurese',SN,'diurese',evo.diurese||null);
+  buildRadio('elim-evac',SN,'evac',evo.evac||null);
+  buildRadio('elim-vom',SN,'vom',evo.vom||null);
+  buildRadio('ts-coracao',CORACAO,'coracao',evo.coracao||null);
+  buildRadio('ts-icteria',SN,'icteria',evo.icteria||null);
+  buildRadio('ts-foto',SN,'foto',evo.foto||null);
+  document.getElementById('e-foto-data').value=evo.fotoData||'';
+  document.getElementById('foto-data-wrap').style.display=(evo.foto==='Sim')?'flex':'none';
+
+  const fCb=document.getElementById('e-formula');
+  fCb.checked=!!evo.formula;
+  document.getElementById('lbl-formula').classList.toggle('on',!!evo.formula);
+  document.getElementById('e-vol').value=evo.formulaVol||'';
+  document.getElementById('vol-wrap').style.display=evo.formula?'flex':'none';
+
+  const sCb=document.getElementById('e-smld');
+  sCb.checked=!!evo.smld;
+  document.getElementById('lbl-smld').classList.toggle('on',!!evo.smld);
+
+  buildSorologias(evo.sorologias||{});
+  document.getElementById('e-obs').value=evo.obs||'';
+
+  openModal('evo');
+}
+function getRadio(name){
+  const s=document.querySelector(`input[name="${name}"]:checked`);return s?s.value:null;
+}
+function getSorologias(){
+  const res={};
+  SOROLOGIAS.forEach(s=>{
+    const sel=document.querySelector(`input[name="sor-${s}"]:checked`);
+    res[s]=sel?sel.value:'Pendente';
+  });
+  return res;
+}
+function saveEvolucao(){
+  const p=patients.find(x=>x.id===evoId);if(!p) return;
+  p.evo={
+    pesoHoje:parseInt(document.getElementById('e-peso').value)||null,
+    glicOn:document.getElementById('e-glic-on').checked,
+    glicVals:document.getElementById('e-glic-vals').value.trim(),
+    tsRN:getRadio('tsrn'),
+    tsMae:getRadio('tsmae'),
+    diurese:getRadio('diurese'),
+    evac:getRadio('evac'),
+    vom:getRadio('vom'),
+    coracao:getRadio('coracao'),
+    icteria:getRadio('icteria'),
+    foto:getRadio('foto'),
+    fotoData:document.getElementById('e-foto-data').value||null,
+    formula:document.getElementById('e-formula').checked,
+    formulaVol:document.getElementById('e-vol').value||null,
+    smld:document.getElementById('e-smld').checked,
+    sorologias:getSorologias(),
+    obs:document.getElementById('e-obs').value.trim(),
+    updatedAt:new Date().toISOString()
+  };
+  p.expanded=true;
+  /* Adicionar automaticamente ao pós-visita se ainda não estiver */
+  const jaExiste=checklists.find(c=>c.patientId===p.id);
+  if(!jaExiste){
+    checklists.push({id:uid(),nome:p.nome,patientId:p.id,done:{},createdAt:new Date().toISOString()});
+  }
+  save();render();closeModal('evo');
+}
+
+function deletePatient(id){
+  if(!confirm('Remover este paciente?')) return;
+  patients=patients.filter(x=>x.id!==id);
+  checklists=checklists.filter(x=>x.patientId!==id);
+  save();render();
+}
+
+function toggleExpand(id){
+  const p=patients.find(x=>x.id===id);
+  if(p){p.expanded=!p.expanded;save();render();}
+}
+
+/* ============================================================
+   RENDER PACIENTES
+============================================================ */
+function render(){
+  const list=document.getElementById('patient-list');
+  if(!patients.length){
+    list.innerHTML=`<div class="empty-state"><i class="ti ti-baby-carriage"></i>Nenhum paciente registrado.<br>Toque em "Novo paciente" para começar.</div>`;
+    return;
+  }
+
+  list.innerHTML='';
+  const sorted=sortPatients(patients);
+
+  /* agrupar por enfermaria */
+  let lastEnf=null;
+  sorted.forEach(p=>{
+    const hv=horasDeVida(p.dataNasc,p.horaNasc);
+    const evo=p.evo;
+    const conds=condutas(p);
+    const hvStr=fmtHoras(hv);
+    const hvDias=hv!==null&&hv>=120;
+    const visited=visitadaHoje(evo);
+    const expanded=!!p.expanded;
+
+    /* separador de enfermaria */
+    if(p.enfermaria&&p.enfermaria!==lastEnf){
+      const sep=document.createElement('div');
+      sep.className='section-group-title';
+      sep.innerHTML=`<i class="ti ti-building-hospital" style="font-size:14px"></i>${p.enfermaria}`;
+      list.appendChild(sep);
+      lastEnf=p.enfermaria;
+    }
+
+    const card=document.createElement('div');
+    card.className='patient-card'+(visited?' visited':'');
+
+    /* --- HEADER --- */
+    const headerDiv=document.createElement('div');
+    headerDiv.className='card-header';
+    headerDiv.onclick=()=>toggleExpand(p.id);
+
+    headerDiv.innerHTML=`
+      <div style="min-width:0">
+        <div class="patient-name">
+          <i class="ti ti-chevron-${expanded?'down':'right'}" style="font-size:14px;color:var(--text3);flex-shrink:0"></i>
+          ${p.nome}
+          ${visited?`<span class="visited-badge"><i class="ti ti-check" style="font-size:10px"></i> Visitado</span>`:''}
+        </div>
+        <div class="patient-meta">
+          <span>IG ${p.ig?p.ig+'sem':'—'}</span><span>·</span>
+          <span>Leito ${p.leito||'—'}</span><span>·</span>
+          <span class="hv-pill ${hvDias?'dias':'horas'}">${hvStr}</span>
+        </div>
+      </div>
+      <div class="card-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-xs" onclick="openReg('${p.id}')"><i class="ti ti-edit"></i> <span>Reg.</span></button>
+        ${!evo?`<button class="btn btn-xs btn-primary" onclick="openEvo('${p.id}')"><i class="ti ti-notes-medical"></i> <span>Evo.</span></button>`:''}
+        <button class="btn btn-xs btn-danger" onclick="deletePatient('${p.id}')"><i class="ti ti-trash"></i></button>
+      </div>
+    `;
+
+    /* --- BODY --- */
+    const bodyDiv=document.createElement('div');
+    bodyDiv.className='card-body'+(expanded?'':' collapsed');
+
+    /* info básica */
+    let bodyHtml=`<div class="info-grid">
+      <div class="info-cell"><div class="lbl">Peso nasc.</div><div class="val">${p.pesoNasc?p.pesoNasc+'g':'—'}</div></div>
+      <div class="info-cell"><div class="lbl">Nascimento</div><div class="val" style="font-size:12px">${p.dataNasc?new Date(p.dataNasc+'T00:00').toLocaleDateString('pt-BR'):'—'} ${p.horaNasc||''}</div></div>
+      <div class="info-cell"><div class="lbl">Tempo de vida</div><div class="val" style="color:${hvDias?'#185FA5':'#0F6E56'}">${hvStr}</div></div>
+    </div>`;
+
+    /* EVOLUÇÃO */
+    if(evo){
+      const cp=evo.pesoHoje&&p.pesoNasc?calcPeso(p.pesoNasc,evo.pesoHoje):null;
+      const alim=[];
+      if(evo.formula) alim.push(`Fórmula${evo.formulaVol?' '+evo.formulaVol+'ml':''}`);
+      if(evo.smld) alim.push('SMLD');
+      const sorBadges=SOROLOGIAS.map(s=>{
+        const v=(evo.sorologias||{})[s]||'Pendente';
+        let cls='badge-gray';
+        if(SOR_IMUNIDADE.includes(s)){
+          if(v==='Imune') cls='badge-teal';
+          else if(v==='Suscetível') cls='badge-warn';
+          else cls='badge-info'; // Pendente
+        } else {
+          if(v==='NR') cls='badge-teal';
+          else if(v==='Reagente') cls='badge-danger';
+          else cls='badge-info'; // Pendente
+        }
+        return `<span class="badge ${cls}" style="margin:2px">${s}: ${v}</span>`;
+      }).join('');
+
+      const glicVals=evo.glicOn?parseGlic(evo.glicVals):[];
+
+      bodyHtml+=`<div class="evo-section">
+        <div class="evo-section-header">
+          <span style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em">Evolução</span>
+          <button class="btn btn-xs btn-warn" onclick="openEvo('${p.id}')"><i class="ti ti-pencil"></i> Editar</button>
+        </div>
+        <div class="evo-grid">
+          ${evo.pesoHoje?`<div class="info-cell"><div class="lbl">Peso hoje</div><div class="val">${evo.pesoHoje}g${cp?` <span style="font-size:11px;color:${cp.pct>7?'#A32D2D':'var(--text2)'}">−${cp.perdido}g (${cp.pct.toFixed(1)}%)</span>`:''}</div></div>`:''}
+          ${evo.glicOn&&glicVals.length?`<div class="info-cell"><div class="lbl">Glicemias</div><div class="val" style="font-size:12px">${glicVals.join(' · ')} <span style="color:var(--text2)">mg/dL</span></div></div>`:''}
+          ${evo.tsRN?`<div class="info-cell"><div class="lbl">TS RN</div><div class="val">${evo.tsRN}</div></div>`:''}
+          ${evo.tsMae?`<div class="info-cell"><div class="lbl">TS Mãe</div><div class="val">${evo.tsMae}</div></div>`:''}
+          ${alim.length?`<div class="info-cell"><div class="lbl">Alimentação</div><div class="val" style="font-size:12px">${alim.join(', ')}</div></div>`:''}
+          ${evo.diurese?`<div class="info-cell"><div class="lbl">Diurese</div><div class="val">${evo.diurese}</div></div>`:''}
+          ${evo.evac?`<div class="info-cell"><div class="lbl">Evacuação</div><div class="val">${evo.evac}</div></div>`:''}
+          ${evo.vom?`<div class="info-cell"><div class="lbl">Vômitos</div><div class="val">${evo.vom}</div></div>`:''}
+          ${evo.coracao?`<div class="info-cell"><div class="lbl">Coraçãozinho</div><div class="val" style="font-size:12px">${evo.coracao}</div></div>`:''}
+          ${evo.icteria?`<div class="info-cell"><div class="lbl">Icterícia</div><div class="val">${evo.icteria}</div></div>`:''}
+          ${evo.foto?`<div class="info-cell"><div class="lbl">Fototerapia</div><div class="val">${evo.foto}${evo.foto==='Sim'&&evo.fotoData?' ('+new Date(evo.fotoData+'T00:00').toLocaleDateString('pt-BR')+')':''}</div></div>`:''}
+        </div>
+        ${sorBadges?`<div style="display:flex;flex-wrap:wrap;margin-bottom:6px">${sorBadges}</div>`:''}
+        ${evo.obs?`<div style="background:var(--bg2);border-radius:var(--radius);padding:8px 10px;font-size:13px;color:var(--text2);margin-bottom:4px"><i class="ti ti-notes" style="font-size:13px;vertical-align:-2px;margin-right:4px"></i>${evo.obs}</div>`:''}
+      </div>`;
+
+      /* CONDUTAS — após evolução */
+      if(conds.length){
+        bodyHtml+=`<div class="condutas-wrap">
+          <div class="condutas-title"><i class="ti ti-alert-triangle" style="font-size:13px"></i> Condutas sugeridas</div>
+          ${conds.map(c=>`<div class="alert alert-${c.type}"><i class="ti ti-${c.type==='danger'?'alert-circle':c.type==='warn'?'alert-triangle':'info-circle'}"></i>${c.msg}</div>`).join('')}
+        </div>`;
+      }
+    } else {
+      /* sem evolução: mostra botão de evolução no body também */
+      bodyHtml+=`<div style="padding:6px 0">
+        <button class="btn btn-primary btn-sm" onclick="openEvo('${p.id}')"><i class="ti ti-notes-medical"></i> Registrar evolução</button>
+      </div>`;
+      /* condutas sem evolução (ex: coraçãozinho pendente por horas) */
+      if(conds.length){
+        bodyHtml+=`<div class="condutas-wrap" style="margin-top:10px">
+          <div class="condutas-title"><i class="ti ti-alert-triangle" style="font-size:13px"></i> Condutas sugeridas</div>
+          ${conds.map(c=>`<div class="alert alert-${c.type}"><i class="ti ti-${c.type==='danger'?'alert-circle':c.type==='warn'?'alert-triangle':'info-circle'}"></i>${c.msg}</div>`).join('')}
+        </div>`;
+      }
+    }
+
+    bodyDiv.innerHTML=bodyHtml;
+    card.appendChild(headerDiv);
+    card.appendChild(bodyDiv);
+    list.appendChild(card);
+  });
+}
+
+/* ============================================================
+   CHECKLIST PÓS-VISITA
+============================================================ */
+function openChkModal(){
+  /* preencher datalist com nomes dos pacientes */
+  const dl=document.getElementById('chk-nome-list');
+  dl.innerHTML=patients.map(p=>`<option value="${p.nome}">`).join('');
+  document.getElementById('chk-nome').value='';
+  openModal('chk');
+}
+function saveChecklist(){
+  const nome=document.getElementById('chk-nome').value.trim();
+  if(!nome){alert('Digite o nome do RN.');return}
+  /* tentar vincular a um paciente existente */
+  const linked=patients.find(p=>p.nome.toLowerCase()===nome.toLowerCase());
+  checklists.push({
+    id:uid(),
+    nome,
+    patientId:linked?linked.id:null,
+    done:{},
+    createdAt:new Date().toISOString()
+  });
+  save();renderChecklist();closeModal('chk');
+}
+function deleteChecklist(id){
+  if(!confirm('Remover da lista pós-visita?')) return;
+  checklists=checklists.filter(x=>x.id!==id);
+  save();renderChecklist();
+}
+function toggleChkItem(chkId,item){
+  const c=checklists.find(x=>x.id===chkId);
+  if(!c) return;
+  c.done[item]=!c.done[item];
+  save();renderChecklist();
+}
+
+function renderChecklist(){
+  const list=document.getElementById('checklist-list');
+  /* sincronizar: garantir que todos os pacientes com evolução estejam no checklist */
+  patients.forEach(p=>{
+    if(p.evo&&!checklists.find(c=>c.patientId===p.id)){
+      checklists.push({id:uid(),nome:p.nome,patientId:p.id,done:{},createdAt:new Date().toISOString()});
+    }
+  });
+
+  if(!checklists.length){
+    list.innerHTML=`<div class="empty-state"><i class="ti ti-clipboard-list"></i>Nenhum paciente na lista pós-visita.<br>A lista é preenchida automaticamente ao registrar a evolução.</div>`;
+    return;
+  }
+  list.innerHTML='';
+  checklists.forEach(c=>{
+    const doneCount=CHK_ITEMS.filter(i=>c.done[i]).length;
+    const total=CHK_ITEMS.length;
+    const pct=Math.round((doneCount/total)*100);
+    const allDone=doneCount===total;
+
+    /* buscar paciente vinculado e suas condutas */
+    let hvHtml='';
+    let condutsHtml='';
+    if(c.patientId){
+      const p=patients.find(x=>x.id===c.patientId);
+      if(p){
+        const hv=horasDeVida(p.dataNasc,p.horaNasc);
+        const hvDias=hv!==null&&hv>=120;
+        hvHtml=`<span class="hv-pill ${hvDias?'dias':'horas'}">${fmtHoras(hv)}</span>`;
+        const conds=condutas(p);
+        if(conds.length){
+          condutsHtml=`<div class="condutas-wrap" style="margin-top:10px">
+            <div class="condutas-title"><i class="ti ti-alert-triangle" style="font-size:13px"></i> Condutas sugeridas</div>
+            ${conds.map(cd=>`<div class="alert alert-${cd.type}"><i class="ti ti-${cd.type==='danger'?'alert-circle':cd.type==='warn'?'alert-triangle':'info-circle'}"></i>${cd.msg}</div>`).join('')}
+          </div>`;
+        }
+      }
+    }
+
+    const div=document.createElement('div');
+    div.className='checklist-card';
+    div.innerHTML=`
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px">
+        <div>
+          <div class="checklist-name">
+            ${allDone?`<i class="ti ti-circle-check-filled" style="color:var(--teal);font-size:18px"></i>`:''}
+            ${c.nome}
+          </div>
+          <div class="checklist-meta">
+            ${hvHtml}
+            ${allDone?'<span class="all-done"><i class="ti ti-check"></i> Tudo concluído</span>':`<span style="color:var(--text2)">${doneCount}/${total} itens</span>`}
+          </div>
+        </div>
+        <button class="btn btn-xs btn-danger" onclick="deleteChecklist('${c.id}')"><i class="ti ti-trash"></i></button>
+      </div>
+      <div class="checklist-progress">
+        <div class="checklist-progress-bar" style="width:${pct}%"></div>
+      </div>
+      <div class="checklist-items">
+        ${CHK_ITEMS.map(item=>`
+          <label class="check-item${c.done[item]?' done':''}" onclick="toggleChkItem('${c.id}','${item}')">
+            <input type="checkbox" ${c.done[item]?'checked':''} onchange="toggleChkItem('${c.id}','${item}')" onclick="event.stopPropagation()">
+            <span>${item}</span>
+          </label>
+        `).join('')}
+      </div>
+      ${condutsHtml}
+    `;
+    list.appendChild(div);
+  });
+}
+
+/* ============================================================
+   FECHAR MODAL CLICANDO FORA
+============================================================ */
+['reg','evo','chk'].forEach(t=>{
+  document.getElementById('modal-'+t).addEventListener('click',function(e){
+    if(e.target===this) closeModal(t);
+  });
+});
+
+/* ============================================================
+   INIT
+============================================================ */
+load();
+updateTopbarActions('pacientes');
+render();
+setInterval(()=>{
+  if(patients.length){render();}
+  /* atualiza horas de vida no checklist se visível */
+  const chkPane=document.getElementById('pane-checklist');
+  if(chkPane.classList.contains('active')) renderChecklist();
+},60000);
+</script>
+</body>
+</html>
